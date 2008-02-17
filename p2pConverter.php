@@ -3,7 +3,7 @@
 Plugin Name: p2pConverter
 Plugin URI: http://www.briandgoad.com/blog/p2pConverter
 Version: 0.4
-Author: <a href="http://www.briandgoad.com/blog">Brian D. Goad, aka bbbco</a>
+Author: Brian D. Goad, aka bbbco
 Description: This plugin allows you to easily convert a post to a page and vice versa through an easy to use interface. Just click on your Manage tab in Administration, and you will see a Convert option under Posts and Pages sub-tabs.
 Author URI: http://www.briandgoad.com
 */
