@@ -1,11 +1,12 @@
 === p2pConverter===
 Author: bbbco
-Plugin URI: http://www.briandgoad.com/blog/p2pConverter
+Author URI: http://www.briandgoad.com/blog
+Plugin URI: http://www.briandgoad.com/blog/downloads/p2pConverter
 Tags: manage, edit, pages, admin, plugin, convert, posts
 Requires at least: 2.5
 Tested up to: 2.6
 Stable tag: 0.6
-Author URI: http://www.briandgoad.com/blog
+
 
 == Description ==
 Converts either a static Page into a Post, or a Post into a static Page!
