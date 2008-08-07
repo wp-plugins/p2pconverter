@@ -1,18 +1,15 @@
 === p2pConverter===
 Author: bbbco
 Author URI: http://www.briandgoad.com/blog
-Plugin URI: http://www.briandgoad.com/blog/downloads/p2pConverter
+Plugin URI: http://www.briandgoad.com/blog/p2pConverter
 Tags: manage, edit, pages, admin, plugin, convert, posts
 Requires at least: 2.5
 Tested up to: 2.6
-Stable tag: 0.6
+Stable tag: 0.7
 
 
 == Description ==
-Converts either a static Page into a Post, or a Post into a static Page!
-Just click on the Manage tab in the Admin interface, and click the Posts or Pages sub-tab.
-Within that page you will see an extra column, with a Convert! option. If you want to convert
-a page or a post to the either, click that link! Or you can click Convert while editing a post or page in the bottom right side bar.  A p2pConverter role capability prevents unwanted users from converting pages (i.e. only Administrators and Editors have this ability), which can be adjusted by using a Role Manager plugin.
+Converts either a static Page into a Post, or a Post into a static Page! Just click on the Manage tab in the Admin interface, and click the Posts or Pages sub-tab. Within that page you will see an extra column, with a Convert! option. If you want to convert a page or a post to the either, click that link! Or you can click Convert while editing a post or page in the bottom right side bar.  A p2pConverter role capability prevents unwanted users from converting pages (i.e. only Administrators and Editors have this ability), which can be adjusted by using a Role Manager plugin.
 
 == Installation ==
 Copy the `p2pConverter` directory to your plugins directory and activate the p2pConverter
@@ -27,6 +24,10 @@ None yet!
 * Incorporate bulk managemnet system per request
 
 == Version History ==
+= Version 0.7 =
+* AJAX-ified things. 
+* Script.aculo.us-ed the Manage section.
+* OOP-ed the code
 
 = Version 0.6 =
 * Can convert post/page while in Edit Mode (located in bottom right side bar)

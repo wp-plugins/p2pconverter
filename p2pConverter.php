@@ -2,17 +2,18 @@
 /*
 Plugin Name: p2pConverter
 Plugin URI: http://www.briandgoad.com/blog/p2pConverter
-Version: 0.6
+Version: 0.7
 Author: Brian D. Goad, aka bbbco
+Author URI: http://www.briandgoad.com
 Description: This plugin allows you to easily convert a post to a page and vice versa through an easy to use interface. You may either click on your Manage tab in Administration, and you will see a Convert option under 
 		Posts and Pages sub-tabs, or click Convert while editing a post or page in the bottom right side bar. A p2pConverter role capability prevents unwanted users from converting pages (i.e. only Administrators and
 		Editors have this ability), which can be adjusted by using a Role Manager plugin.
-Author URI: http://www.briandgoad.com
 */
 	
 register_activation_hook(__FILE__,'p2p_install');
 register_deactivation_hook(__FILE__,'p2p_uninstall');	
-add_action('init', 'update_convert');
+
+//add_action('init', 'update_convert');
 
 //Add p2p Capabilities to top two basic roles. Can be adjusted with Role Manager plugin.	
 function p2p_install() {
@@ -33,51 +34,163 @@ function p2p_uninstall() {
 	}
 }
 
-//Updates Database if valid info is passed
+//AJAX-ify
+add_action('admin_print_scripts', 'p2p_js_admin_header' );
+function p2p_js_admin_header() {
+	// use JavaScript SACK, script.aculo.us, libraries for Ajax
+	wp_print_scripts( array( 'sack' ));
+	wp_enqueue_script('scriptaculous');
+	?>
+	<script type="text/javascript">
+	//<![CDATA[
+	
+	//Call AJAX in Wordpress
+	function p2p_send(pid, ptype) {
+	
+		var mysack = new sack("<?php bloginfo( 'wpurl' ); ?>/wp-admin/admin-ajax.php");    
+
+		mysack.execute = 1;
+		mysack.method = 'POST';
+		mysack.setVar( "action", "convert" );
+		mysack.setVar( "post", pid );
+		mysack.setVar( "ptype", ptype );
+		mysack.encVar( "cookie", document.cookie, false );
+		mysack.onError = function() { alert('Ajax error in p2pConverter' )};
+		mysack.runAJAX();
+
+		return true;
+	
+	} 
+	
+	//Called after running PHP to determine what to do
+	function determineFunc(pid, ptype) {
+		
+		pid = escape(pid);
+		ptype = escape(ptype);
+		var boo = escape(window.location.pathname);
+
+		if (boo.match("edit.php")||boo.match("edit-pages.php")){
+			ptype = reverse_type(ptype);
+			remove_row(pid, ptype);
+		} else {
+			editDoc(pid, ptype);
+		}
+	
+	}
+	
+	function hoverOver(pid, ptype) {
+		pid = escape(pid);
+		ptype = escape(reverse_type(ptype));
+		var row = document.getElementById(ptype+"-"+pid);
+		row.style.backgroundColor = "#FFCC99";
+	}
+	
+	function hoverOut(pid, ptype) {
+		pid = escape(pid);
+		ptype = escape(reverse_type(ptype));
+		var row = document.getElementById(ptype+"-"+pid);
+		row.style.backgroundColor = ""
+	}
+	
+	//If in Manage Section, remove nicely
+	function remove_row(pid, ptype) {
+		
+		var row = document.getElementById(ptype+"-"+pid);
+		row.style.backgroundColor = "#FF9900";
+		Effect.Fade(row, {duration: .75 });
+	
+	}
+	
+	//If in Edit Section, return to correct section
+	function editDoc(pid, ptype) {
+	
+		gotoUrl = escape(ptype) + ".php?action=edit&post=" + escape(pid);
+		this.location.href = gotoUrl;
+	
+	}
+	
+	//Reverse the type sent
+	function reverse_type(orig) {
+		
+		if (orig == "post") {
+			var newOrig = "page";
+		} else if (orig == "page") {
+			var newOrig = "post";
+		} 
+		return newOrig;
+	
+	}
+	
+	//]]>
+	</script>
+
+	<?php
+}
+
+//Updates Database if valid info is passed, via AJAX
+add_action('wp_ajax_convert', 'update_convert');
 function update_convert() {
 	// Checks if appropriate Role has Capability to Edit Post
 	if ( function_exists('current_user_can') && (current_user_can('p2pConverter'))) {
 		$ready = false;
-		if(@$_GET['post']) :
-			if(@$_GET['ptype']) :
-				$p_id = attribute_escape(@$_GET['post']);
+		if(@$_POST['post']) :
+			if(@$_POST['ptype']) :
+				$p_id = attribute_escape(@$_POST['post']);
 				global $wpdb, $wp_rewrite;
 				$table = $wpdb->prefix. "posts";
-				$ptype = attribute_escape(@$_GET['ptype']);
+				$ptype = attribute_escape(@$_POST['ptype']);
 				$pupdate = "UPDATE " . $table . " SET post_type = '" . $ptype . "' WHERE ID='" . $p_id . "'";
 				$wpdb->query($pupdate);
 				
 				//Important! Rewrites permalinks for post/page files 
 				$wp_rewrite->flush_rules();
+				
+				//Call Javascript function
+				die('determineFunc("'.$p_id.'", "'.$ptype.'");');
+				
 			endif;
 		endif;
 	}
 }
 
+//The basic display across the admin screen
+function basicLooks($post_id, $ptype) {
+	if ( function_exists('current_user_can') && current_user_can('p2pConverter')) {
+		$title = preg_replace("/\r?\n/", "\\n", addslashes(strip_tags(get_the_title("", "", false)))); 
+		$optype = ucwords(reverse_type($ptype));
+		$uptype = ucwords($ptype);
+		$message = 'Are you sure you really want to convert this ' . $optype . ', ' . $title . ', into a '. $uptype . '?';
+		$button_text = "Convert to " . $uptype . "!";
+		$con_div = '<div style="width:130px; padding:7px;"><a class="button button-highlighted" href="javascript:void(null)" onmouseover="hoverOver(' . $post_id . ', \'' . $ptype . '\');" onmouseout="hoverOut(' . $post_id . ', \'' . $ptype . '\');" onClick=\'if (confirm("' . $message . ', ' . $title . '")) {p2p_send(' . $post_id . ', "' . $ptype . '"); }\'>'.__($button_text).'</a></div>';
+		echo $con_div;
+		return;
+	}
+}
+
+//Have to be able to reverse type in PHP as well
+function reverse_type($orig) {
+	if ($orig == "post") {
+		$orig = "page";
+	} elseif ($orig == "page") {
+		$orig = "post";
+	} 
+	return $orig;
+}
+
 //Add Convert option while editing posts
 add_action('submitpost_box', 'add_post_side_option');
 function add_post_side_option(){
-	if ( function_exists('current_user_can') && current_user_can('p2pConverter')) {
-		global $post;
-		$post_id = $post->ID;
-		$title = preg_replace("/\r?\n/", "\\n", addslashes(strip_tags(get_the_title("", "", false)))); 
-		$message = 'Are you sure you really want to convert this Post, ' . $title . ', into a static Page?';
-		$con_div = '<a class="button button-highlighted" href="javascript:void(null)" onClick=\'if (confirm("' . $message . '")) {window.location.href="page.php?action=edit&post=' . $post_id . '&amp;ptype=page"; }\'>'.__("Convert to Page!").'</a>';
-		echo $con_div;
-	}
+	global $post;
+	$post_id = $post->ID;
+	basicLooks($post_id, "page");
 }
 
 //Add Convert option while editing pages
 add_action('submitpage_box', 'add_page_side_option');
 function add_page_side_option(){
-	if ( function_exists('current_user_can') && current_user_can('p2pConverter')) {
-		global $post;
-		$post_id = $post->ID;
-		$title = preg_replace("/\r?\n/", "\\n", addslashes(strip_tags(get_the_title("", "", false)))); 
-		$message = 'Are you sure you really want to convert this static Page, ' . $title . ', into a Post?';
-		$con_div = '<a class="button button-highlighted" href="javascript:void(null)" onClick=\'if (confirm("' . $message . '")) {window.location.href="post.php?action=edit&post=' . $post_id . '&amp;ptype=post"; }\'>'.__("Convert to Post!").'</a>';
-		echo $con_div;
-	}
+	global $post;
+	$post_id = $post->ID;
+	basicLooks($post_id, "post");
 }
 
 //Adds Column in Manage Posts
@@ -95,23 +208,16 @@ function add_convert_column_post($defaults) {
 add_action('manage_posts_custom_column', 'pop_convert_column_post', 10, 2);
 function pop_convert_column_post($column_name, $post_id){
 	if( $column_name == 'convert_post' ) {
-		$title = preg_replace("/\r?\n/", "\\n", addslashes(strip_tags(the_title("", "", false)))); 
-		$message = 'Are you sure you really want to convert this Post, ' . $title . ', into a static Page?';
-		$pos = strpos($_SERVER["REQUEST_URI"], "?");
-		if ($pos) {
-			$char = "&amp;";
-		} else {
-			$char = "?";
-		}
-		$con_div = '<a class="edit" style="text-align: center;" href="javascript:void(null)" onClick=\'if (confirm("' . $message . '")) {window.location.href="' . $_SERVER["REQUEST_URI"] . $char . 'post=' . $post_id . '&amp;ptype=page"; }\'>'.__("Convert to Page!").'</a>';
-		echo $con_div;
+		basicLooks($post_id, "page");
 	}
+	
 }
 
 //Adds Column in Manage Pages (thanks Scompt!)
 add_filter('manage_pages_columns', 'add_convert_column_page'); 
 function add_convert_column_page($defaults) {
 	$defaults ['convert_page']  = '<div style="text-align: center; width:100px;">' . __('Convert to Post') . '</div>';
+	
 	// Checks if appropriate Role has Capability to Edit Post
 	if ( function_exists('current_user_can') && (!current_user_can('p2pConverter'))) {
 		unset($defaults['convert_page']);
@@ -123,19 +229,8 @@ function add_convert_column_page($defaults) {
 add_action('manage_pages_custom_column', 'pop_convert_column_page', 10, 2);
 function pop_convert_column_page($column_name, $post_id){
 	if( $column_name == 'convert_page' ) {
-		$title = preg_replace("/\r?\n/", "\\n", addslashes(strip_tags(the_title("", "", false)))); 
-		$message = 'Are you sure you really want to convert this static Page, ' . $title . ', into a Post?';
-		$pos = strpos($_SERVER["REQUEST_URI"], "?");
-		if ($pos) {
-			$char = "&amp;";
-		} else {
-			$char = "?";
-		}
-		$con_div = '<a class="edit" style="text-align: center;" href="javascript:void(null)" onClick=\'if (confirm("' . $message . '")) {window.location.href="' . $_SERVER["REQUEST_URI"] . $char .'post=' . $post_id . '&amp;ptype=post"; }\'>'.__("Convert to Post!").'</a>';
-		echo $con_div;
+		basicLooks($post_id, "post");
 	}
 }
-
-
 
 ?>
