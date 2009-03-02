@@ -1,5 +1,5 @@
 === p2pConverter===
-Author: bbbco
+Author: Brian D. Goad (bbbco)
 Author URI: http://www.briandgoad.com/blog
 Plugin URI: http://www.briandgoad.com/blog/p2pConverter
 Tags: manage, edit, page, pages, admin, plugin, convert, post, posts, change, p2p
