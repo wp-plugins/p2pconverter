@@ -1,11 +1,13 @@
 <?php 
 /*
 Plugin Name: p2pConverter
-Plugin URI: http://www.briandgoad.com/blog/downloads/p2pConverter
+Plugin URI: http://www.briandgoad.com/downloads/ptypeconverter
 Version: 0.8
 Author: Brian D. Goad
-Author URI: http://www.briandgoad.com/blog
-Description: This plugin allows you to easily convert a post to a page and vice versa through an easy to use interface. You may either click on your Manage tab in Administration, and you will see a Convert option under Posts and Pages sub-tabs, or click Convert while editing a post or page in the bottom right side bar. A p2pConverter role capability prevents unwanted users from converting pages (i.e. only Administrators and Editors have this ability), which can be adjusted by using a Role Manager plugin.
+Author URI: http://www.briandgoad.com/
+Description: PLEASE NOTE: THIS PLUGIN HAS BEEN DEPRECATED AND IS ONLY ACTIVE UP TO WP 2.7.1 
+Please use its successor, pTypeConverter found here: http://wordpress.org/extend/plugins/ptypeconverter/ or http://www.briandgoad.com/downloads/ptypeconverter/
+This plugin allows you to easily convert a post to a page and vice versa through an easy to use interface. You may either click on your Manage tab in Administration, and you will see a Convert option under Posts and Pages sub-tabs, or click Convert while editing a post or page in the bottom right side bar. A p2pConverter role capability prevents unwanted users from converting pages (i.e. only Administrators and Editors have this ability), which can be adjusted by using a Role Manager plugin.
 */
 	
 register_activation_hook(__FILE__,'p2p_install');

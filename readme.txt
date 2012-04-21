@@ -1,13 +1,16 @@
 === p2pConverter===
 Author: Brian D. Goad (bbbco)
-Author URI: http://www.briandgoad.com/blog
-Plugin URI: http://www.briandgoad.com/blog/p2pConverter
+Author URI: http://www.briandgoad.com/
+Plugin URI: http://www.briandgoad.com/downloads/ptypeconverter
 Tags: manage, edit, page, pages, admin, plugin, convert, post, posts, change, p2p
 Requires at least: 2.5
 Tested up to: 2.7.1
 Stable tag: 0.8
 
 == Description ==
+= PLEASE NOTE: THIS PLUGIN HAS BEEN DEPRECATED AND IS ONLY ACTIVE UP TO WP 2.7.1 =
+Please use its successor, pTypeConverter found here: http://wordpress.org/extend/plugins/ptypeconverter/ or http://www.briandgoad.com/downloads/ptypeconverter/
+----
 Converts either a static Page into a Post, or a Post into a static Page! Depending on what type you want to convert, click on Posts or Pages. In the main table of all the Posts or Pages listed, you will see an extra column, with a Convert to Post! or Convert to Page! option. If you want to convert a Page or a Post to the either, click that button. Or you can click the Convert button while editing a Post or Page right next to the Delete and Publish buttons.  A p2pConverter role capability prevents unwanted users from converting pages (i.e. only Administrators and Editors have this ability to begin with), which can be adjusted by using a Role Manager plugin.
 
 == Installation ==
@@ -15,7 +18,7 @@ Copy the `p2pConverter` directory to your plugins directory and activate the p2p
 plugin from WordPress, and volia! You will now be able to convert!
 
 == Frequently Asked Questions ==
-None yet!
+Please see the new plugin pTypeConverter
 [Ask a question] mailto: bdgoad (at) gmail (dot) com
 
 == Future Plans ==
